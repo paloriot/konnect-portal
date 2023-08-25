@@ -5,7 +5,7 @@
       :style="catalog_cover_style"
     >
       <h4 class="products-welcome mb-4 font-normal color-text_colors-secondary text-2xl">
-        {{ welcome_message }}
+        'Welcome to our OSS API Portal!'
       </h4>
       <h1 class="products-title mb-5 font-normal color-text_colors-hero text-4xl">
         {{ primary_header }}
@@ -101,7 +101,7 @@ export default defineComponent({
 
     const defaultHeaders = () => {
       if (!welcome_message.value) {
-        welcome_message.value = 'Welcome to our OSS API Portal!'
+        welcome_message.value = 'Welcome to our API Portal!'
       }
 
       if (!primary_header.value) {
