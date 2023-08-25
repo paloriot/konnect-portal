@@ -101,7 +101,7 @@ export default defineComponent({
 
     const defaultHeaders = () => {
       if (!welcome_message.value) {
-        welcome_message.value = 'Welcome to our API Portal!'
+        welcome_message.value = 'Welcome to our OSS API Portal!'
       }
 
       if (!primary_header.value) {
