@@ -4,7 +4,7 @@
       class="products-top-section flex flex-col items-center justify-center py-16 bg-section_colors-hero"
       :style="catalog_cover_style"
     >
-      <h4 class="products-welcome mb-4 font-normal color-text_colors-secondary text-2xl">
+      <h4 class="products-welcome mb-4 font-normal color-text_colors-footer text-2xl">
         Welcome to TASE API Portal!
       </h4>
       <h1 class="products-title mb-5 font-normal color-text_colors-hero text-4xl">
