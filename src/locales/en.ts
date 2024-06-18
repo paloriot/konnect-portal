@@ -40,6 +40,18 @@ export const en = {
     noProductVersionsTitle: 'No Product Versions',
     registerProductVersion: 'Register Product version'
   },
+  authStrategyInfo: {
+    titleLabel: 'Supported Application Auth Strategy:',
+    credentialTypeLabel: 'Credential Type:',
+    registerBtnText: (productVersionName: string) => `Register for ${productVersionName}`,
+    authMethods: 'Auth Methods:',
+    keyNames: 'Key Names:',
+    bearer: 'Bearer',
+    keyAuth: 'Key Auth',
+    clientCredentials: 'Client Credentials',
+    selfManagedClientCredentials: 'Self Managed',
+    session: 'Session'
+  },
   userDropdown: {
     myApps: 'My Apps',
     logout: 'Logout'
@@ -99,6 +111,11 @@ export const en = {
     delete: 'Delete',
     proceed: 'Proceed',
     applicationName: 'Application Name ',
+    authStrategy: 'Auth Strategy',
+    authStrategyWarning: 'You cannot create an application as this developer portal has no available application auth strategies. Please contact a developer portal admin.',
+    grantedScopes: 'Granted Scopes:',
+    availableScopes: 'Available Scopes',
+    filterScopesPlaceholder: 'Filter Scopes',
     clientID: 'Client ID: ',
     clientSecret: 'Client Secret: ',
     reqField: ' indicates required field',
@@ -150,6 +167,7 @@ export const en = {
   },
   productList: {
     titleProducts: 'Products',
+    showMoreLabel: (items: string) => `+ ${items} more`,
     actions: {
       unregister: 'Unregister'
     },
@@ -179,11 +197,17 @@ export const en = {
   },
   applicationRegistration: {
     noAvailableApplications: 'You currently have no applications to register.',
+    noFoundApplications: 'You currently have no applications with that name.',
     noApplications: 'No Applications',
     selectApplication: 'Select Application',
     createNewApplication: 'Create new Application +',
     createApplication: 'Create an Application',
+    searchPlaceholder: 'Search applications',
     cancelButton: 'Cancel',
+    filterScopes: 'Filter...',
+    availableScopesLabel: 'Select scopes',
+    updateScopesWarning: 'Updating scopes will affect all application registrations related to this application',
+    fetchingScopesLabel: 'Fetching scopes...',
     registeredApplicationsProduct: 'The following applications are already registered to this product:',
     modalApplicationRegistrationDefault: {
       title: (serviceName: string, productVersion: string) => `Register for ${serviceName} - ${productVersion}`,
@@ -274,16 +298,24 @@ export const en = {
     logoAlt: 'logo'
   },
   myApp: {
+    authStrategyWarning: 'You cannot create an application as this developer portal has no available application auth strategies. Please contact a developer portal admin.',
+    authStrategyFetchError: (errString: string) => `Error fetching auth strategies: ${errString}`,
     newApp: 'New App',
     plus: 'Plus',
     myApps: 'My Apps',
     refreshSecret: 'Refresh secret',
+    refreshSecretSuccess: 'Successfully refreshed secret',
+    refreshSecretFailure: (str: string) => `Failed to refresh secret: ${str}`,
     delete: 'Delete',
     cancel: 'Cancel',
     noApp: 'No Applications',
+    searchPlaceholder: 'Search applications',
+    noSearchResults: 'No Applications Found',
     create: 'Create a new app',
     getStarted: ' to get started',
-    deleteDialog: (name: string) => `Are you sure you want to delete ${name}? This action cannot be undone.`
+    deleteDialog: (name: string) => `Are you sure you want to delete ${name}? This action cannot be undone.`,
+    deleteSuccess: 'Application successfully deleted',
+    deleteFailure: (str: string) => `Failed to delete application: ${str}`
   },
   router: {
     portalTitle: 'Developer Portal',
@@ -293,6 +325,7 @@ export const en = {
     resetPasswordTitle: 'Reset Password',
     catalogTitleProduct: 'Product Catalog',
     specTitle: 'API Spec',
+    oauth2RedirectTitle: 'OAuth2 Authorization',
     docsTitle: 'API Docs',
     appsTitle: 'My Apps',
     createAppTitle: 'Create New Application',
@@ -302,5 +335,12 @@ export const en = {
     notFoundTitle: 'Not Found',
     forbiddenTitle: 'Forbidden',
     errorTitle: 'Error'
+  },
+  oauth2: {
+    dataNotFound: 'OAuth data not found',
+    noDescription: 'No description',
+    moreInfo: 'More info: ',
+    authMaybeUnsafe: "Authorization may be unsafe, passed state was changed in server Passed state wasn't returned from auth server",
+    defaultError: '[Authorization failed]: no accessCode received from the server'
   }
 }

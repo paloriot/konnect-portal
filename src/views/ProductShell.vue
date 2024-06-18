@@ -6,7 +6,7 @@
       class="mt-6"
       :message="productError"
     />
-    <template v-else>
+    <template v-else-if="product">
       <div
         class="sidebar-wrapper"
       >
@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch, watchEffect } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import getMessageFromError from '@/helpers/getMessageFromError'
@@ -57,7 +57,6 @@ const deselectOperation = ref<boolean>(false)
 
 const deprecatedWarning = helpText.productVersion.deprecatedWarningProduct
 
-// @ts-ignore
 const productStore = useProductStore()
 const { product, documentTree, activeDocumentSlug, activeProductVersionId } = storeToRefs(productStore)
 
@@ -109,13 +108,15 @@ async function fetchDocumentTree () {
 
   try {
     const requestOptions = {
-      productId: id,
-      accept: DocumentContentTypeEnum.VndKonnectDocumentTreejson
+      productId: id
     }
-    // @ts-ignore
     // overriding the axios response because we're specifying what we're accepting above
     if (productStore.product) {
-      const res = await documentationApi.listProductDocuments(requestOptions) as AxiosResponse<ListDocumentsTree, any>
+      const res = await documentationApi.listProductDocuments(requestOptions, {
+        headers: {
+          accept: DocumentContentTypeEnum.VndKonnectDocumentTreejson
+        }
+      }) as AxiosResponse<ListDocumentsTree, any>
 
       productStore.setDocumentTree((res.data).data)
     }
@@ -208,6 +209,10 @@ onMounted(async () => {
   await fetchProduct()
   await fetchDocumentTree()
   initActiveProductVersionId()
+})
+
+onUnmounted(() => {
+  productStore.setProduct(null)
 })
 
 watch(() => productVersionParam.value, () => {

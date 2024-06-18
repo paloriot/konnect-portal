@@ -5,6 +5,56 @@
   >
     <div class="container max-w-screen-2xl px-5 md:px-0">
       <div class="swagger-ui has-sidebar breadcrumbs">
+        <KCard
+          v-if="applicationRegistrationEnabled && currentVersion?.registration_configs?.length && !isPublic"
+          class="auth-strategy-card"
+          data-testid="auth-strategy-card"
+        >
+          <template #body>
+            <span
+              class="label"
+              data-testid="auth-strategy-title"
+            >
+              {{ helpText.authStrategyInfo.titleLabel }}
+              <KBadge shape="rectangular">
+                {{ currentVersion?.registration_configs?.[0].name }}
+              </KBadge>
+            </span>
+            <p class="auth-methods-label">
+              {{ helpText.authStrategyInfo.authMethods }}
+            </p>
+            <div class="info-container">
+              <KCard class="badge-container">
+                <template #body>
+                  <KBadge
+                    v-if="currentVersion?.registration_configs?.[0].credential_type === 'key_auth'"
+                    shape="rectangular"
+                    data-testid="auth-method-key-auth"
+                  >
+                    {{ helpText.authStrategyInfo.keyAuth }}
+                  </KBadge>
+                  <KBadge
+                    v-for="(authMethod, index) in currentVersion?.registration_configs?.[0].auth_methods"
+                    v-else
+                    :key="authMethod + index"
+                    :data-testid="`auth-method-${authMethod}`"
+                    shape="rectangular"
+                  >
+                    {{ authMethodLabelObj[authMethod] }}
+                  </KBadge>
+                </template>
+              </KCard>
+              <KButton
+                appearance="primary"
+                class="register-btn"
+                data-testid="app-reg-v2-register-btn"
+                @click="triggerViewSpecRegistrationModal"
+              >
+                {{ helpText.authStrategyInfo.registerBtnText(currentVersion?.name) }}
+              </KButton>
+            </div>
+          </template>
+        </KCard>
         <KBreadcrumbs :items="breadcrumbs" />
       </div>
     </div>
@@ -37,12 +87,43 @@
 
     <SpecDetails
       v-else-if="spec"
+      ref="specDetailsRef"
       class="w-100"
       :document="spec"
       :has-sidebar="false"
-      :application-registration-enabled="applicationRegistrationEnabled"
+      :application-registration-enabled="false"
       :active-operation="sidebarActiveOperationListItem"
       :current-version="currentVersion?.name"
+      :theme-overrides="{
+        languages: [
+          {
+            prismLanguage: 'bash',
+            target: 'shell',
+            client: 'curl'
+          },
+          {
+            prismLanguage: 'javascript',
+            target: 'javascript',
+            client: 'xhr'
+          },
+          {
+            prismLanguage: 'python',
+            target: 'python'
+          },
+          {
+            prismLanguage: 'ruby',
+            target: 'ruby'
+          },
+          {
+            prismLanguage: 'java',
+            target: 'java'
+          },
+          {
+            prismLanguage: 'csharp',
+            target: 'csharp'
+          }
+        ]
+      }"
       @clicked-view-spec="triggerViewSpecModal"
       @clicked-register="triggerViewSpecRegistrationModal"
     />
@@ -65,7 +146,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, ref, watch, onMounted, toRaw, ComputedGetter } from 'vue'
+import { defineComponent, computed, ref, watch, onMounted, toRaw, ComputedGetter, PropType } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
 import jsyaml from 'js-yaml'
@@ -74,7 +155,7 @@ import getMessageFromError from '@/helpers/getMessageFromError'
 import ViewSpecModal from '@/components/ViewSpecModal.vue'
 import ViewSpecRegistrationModal from '@/components/ViewSpecRegistrationModal.vue'
 import usePortalApi from '@/hooks/usePortalApi'
-import { useI18nStore, useAppStore, usePermissionsStore, useProductStore } from '@/stores'
+import { useI18nStore, useAppStore, usePermissionsStore, useProductStore, ProductWithVersions } from '@/stores'
 import { OperationListItem, SpecDetails } from '@kong-ui-public/spec-renderer'
 import { idFromPathMethod } from '@/helpers/generatedOperationId'
 import '@kong-ui-public/spec-renderer/dist/style.css'
@@ -89,7 +170,7 @@ export default defineComponent({
   },
   props: {
     product: {
-      type: Object,
+      type: Object as PropType<ProductWithVersions>,
       required: true
     }
   },
@@ -103,22 +184,29 @@ export default defineComponent({
     const isAllowedToRegister = ref(false)
     const specContents = ref('')
     const specName = ref('')
+    const specExt = ref('')
     const specDetails = ref(null)
     const productVersions = ref(new Map())
     const { canUserAccess } = usePermissionsStore()
     const appStore = useAppStore()
     const { isPublic } = storeToRefs(appStore)
 
-    const objectParsers = [
-      (x: string) => JSON.parse(x),
-      (x: string) => jsyaml.load(x)
+    const specTypes = [
+      { ext: '.json', parser: (x: string) => JSON.parse(x) },
+      { ext: '.yaml', parser: (x: string) => jsyaml.load(x) }
     ]
 
     const applicationRegistrationEnabled = computed(() => {
-      return spec.value.statusCode !== 404 && currentVersion.value.registration_configs?.length && isAllowedToRegister.value
+      return Boolean(currentVersion.value?.registration_configs?.length && isAllowedToRegister.value)
     })
 
     const helpText = useI18nStore().state.helpText
+
+    const authMethodLabelObj = {
+      bearer: helpText.authStrategyInfo.bearer,
+      session: helpText.authStrategyInfo.session,
+      client_credentials: helpText.authStrategyInfo.clientCredentials
+    }
 
     const productStore = useProductStore()
     const { sidebarActiveOperation, sidebarOperations } = storeToRefs(productStore)
@@ -127,7 +215,7 @@ export default defineComponent({
     const convertOperationToListItem: ComputedGetter<OperationListItem|null> = () => {
       if (sidebarActiveOperation.value) {
         const { tags, ...props } = sidebarActiveOperation.value
-        const tag = props.tag ? props.tag : tags[0]
+        const tag = props.tag ? props.tag : tags?.[0]
 
         return {
           ...props,
@@ -149,6 +237,19 @@ export default defineComponent({
     const $route = useRoute()
     const { portalApiV2 } = usePortalApi()
 
+    const specDetailsRef = ref(null)
+
+    watch(() => specDetailsRef.value, (newValue, oldValue) => {
+      if (newValue && newValue !== oldValue) {
+        newValue.swaggerInstance.instance.initOAuth({
+          usePkceWithAuthorizationCodeGrant: true,
+          additionalQueryStringParams: {
+            nonce: Math.random().toString(36).substring(7)
+          }
+        })
+      }
+    })
+
     // fallback in case the operations are loaded in after the spec.
     watch(() => sidebarOperations.value, async () => {
       if (sidebarOperations.value?.length) {
@@ -161,11 +262,14 @@ export default defineComponent({
       }
     })
 
-    watch(() => props.product, async () => {
+    watch(() => props.product, async (newProduct, oldProduct) => {
+      if (newProduct?.id === oldProduct?.id) {
+        return
+      }
+
       isAllowedToRegister.value = await canUserAccess({
-        service: 'konnect',
-        action: '#consume',
-        resourcePath: `services/${$route.params.product}`
+        action: 'register',
+        productId: $route.params.product.toString()
       })
 
       await processProduct()
@@ -186,12 +290,11 @@ export default defineComponent({
       }
     })
 
-    watch(() => $route.params.product_version, async (productVersionId) => {
-      if (productVersionId) {
+    watch(() => $route.params.product_version, async (productVersionId, oldValue) => {
+      if (productVersionId && (oldValue !== productVersionId)) {
         isAllowedToRegister.value = await canUserAccess({
-          service: 'konnect',
-          action: '#consume',
-          resourcePath: `services/${$route.params.product}`
+          action: 'register',
+          productId: $route.params.product.toString()
         })
 
         // this is not called on page load, but will be called when back button clicked and on select
@@ -202,9 +305,8 @@ export default defineComponent({
 
     onMounted(async () => {
       isAllowedToRegister.value = await canUserAccess({
-        service: 'konnect',
-        action: '#consume',
-        resourcePath: `services/${$route.params.product}`
+        action: 'register',
+        productId: $route.params.product.toString()
       })
 
       await processProduct()
@@ -218,7 +320,6 @@ export default defineComponent({
 
     function triggerViewSpecModal () {
       viewSpecModalIsVisible.value = true
-      specContents.value = getSpecContents()
     }
 
     function triggerViewSpecRegistrationModal () {
@@ -258,17 +359,8 @@ export default defineComponent({
     }
 
     function downloadSpecContents (): void {
-      let extension: string
       let fileName: string
-      const content = specContents.value
       const element = document.createElement('a')
-
-      try {
-        JSON.parse(content)
-        extension = '.json'
-      } catch (e) {
-        extension = '.yaml'
-      }
 
       if (window.location.pathname.includes('/')) {
         const splitPath = window.location.pathname.split('/')
@@ -279,15 +371,11 @@ export default defineComponent({
       }
 
       element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(specContents.value))
-      element.setAttribute('download', fileName + extension)
+      element.setAttribute('download', fileName + specExt.value)
       element.style.display = 'none'
       document.body.appendChild(element)
       element.click()
       document.body.removeChild(element)
-    }
-
-    function getSpecContents () {
-      return JSON.stringify(spec.value, null, 2)
     }
 
     function setTitle (versionName: string) {
@@ -323,7 +411,7 @@ export default defineComponent({
 
       return await portalApiV2.value.service.versionsApi.getProductVersionSpec({
         productId: $route.params.product as string,
-        versionId: version
+        productVersionId: version
       })
         .then(async res => {
           // no content
@@ -333,15 +421,16 @@ export default defineComponent({
             return res
           }
 
-          const rawContent = res.data.content
+          specContents.value = res.data.content
 
           let parsedObject: any
           const parseErrors = []
 
-          for (const parser of objectParsers) {
+          for (const specType of specTypes) {
             try {
-              parsedObject = parser(rawContent)
+              parsedObject = specType.parser(specContents.value)
               if (parsedObject) {
+                specExt.value = specType.ext
                 break
               }
             } catch (err) {
@@ -454,6 +543,8 @@ export default defineComponent({
     }
 
     return {
+      specDetailsRef,
+      authMethodLabelObj,
       helpText,
       viewSpecModalIsVisible,
       viewSpecRegistrationModalIsVisible,
@@ -525,4 +616,39 @@ export default defineComponent({
 .spec.api-documentation .breadcrumbs {
   margin-left: 0;
 }
+</style>
+
+<style lang="scss" scoped>
+  .auth-strategy-card {
+    --KCardBorder: 1px solid var(--section_colors-stroke);
+    --KCardBorderRadius: 4px;
+    --KCardPaddingX: 12px;
+    --KCardPaddingY: 12px;
+    margin-bottom: 4px;
+
+    .label, .auth-methods-label {
+      margin-bottom: 4px;
+    }
+
+    .info-container {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      row-gap: 8px;
+    }
+
+    :deep(.k-badge) {
+      &:not(:last-child) {
+        margin-right: 4px;
+      }
+      background: var(--button_colors-primary-fill, var(--blue-500, #1155cb));
+      border: 1px solid transparent;
+      color: var(--button_colors-primary-text, #fff);
+    }
+
+    .swagger-ui .auth-container .errors {
+      word-wrap: break-word;
+    }
+  }
 </style>

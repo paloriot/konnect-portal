@@ -1,4 +1,23 @@
-import { apps, productRegistration, productRegistrations, versions } from '../fixtures/consts'
+import { apps, productRegistrations } from '../fixtures/consts'
+
+const noAnalytics = {
+  analytics: null
+}
+
+const hasAnalytics = {
+  analytics: {
+    percentiles: true,
+    retention_ms: 36720000000
+  }
+}
+
+const mockConfig = (analytics: boolean) => {
+  cy.intercept('GET', '**/api/v2/stats/config', {
+    statusCode: 200,
+    body: analytics ? hasAnalytics : noAnalytics,
+    delay: 0
+  })
+}
 
 describe('Contextual Developer Analytics', () => {
   beforeEach(() => {
@@ -21,8 +40,8 @@ describe('Contextual Developer Analytics', () => {
     viewAnalyticsButton: '[data-testid="application-dashboard-button"]'
   }
 
-  it('My Apps – displays displays metric cards if the feature flag is on', () => {
-    cy.mockLaunchDarklyFlags([{ name: 'ma-1002-dev-portal-contextual-analytics', value: true }])
+  it('My Apps – displays displays metric cards', () => {
+    mockConfig(true)
 
     cy.mockApplications(apps, 4)
 
@@ -36,38 +55,10 @@ describe('Contextual Developer Analytics', () => {
     cy.get(selectors.dashboardDropdownLink).should('exist')
   })
 
-  it('My Apps – does not display metric cards or the analytics dropdown link if the feature flag is off', () => {
-    cy.mockLaunchDarklyFlags([{ name: 'ma-1002-dev-portal-contextual-analytics', value: false }])
 
-    cy.mockApplications(apps, 5)
-    cy.visit('/my-apps')
+  it('App Dashboard - vitals elements load', () => {
+    mockConfig(true)
 
-    cy.get(selectors.metricCardsParent).should('not.exist')
-    cy.get('[data-testid="applications-table"]').find('.actions-badge').first().click()
-    cy.get(selectors.dashboardDropdownLink).should('not.exist')
-  })
-
-  it('My App details page – does not display Metrics Card, View Analytics button if the feature flag is off', () => {
-    cy.mockLaunchDarklyFlags([{ name: 'ma-1002-dev-portal-contextual-analytics', value: true }])
-    cy.mockApplications(apps, 4)
-
-    cy.intercept(
-      'GET',
-      `**/api/v2/applications/${apps[0].id}`, {
-        statusCode: 200,
-        body: { ...apps[0] }
-      }
-    ).as('getSingleApplication')
-
-    cy.mockApplicationWithCredAndReg(apps[0])
-
-    cy.visit(`/application/${apps[0].id}`)
-    cy.get('[data-testid="analytics-metric-cards"]').should('not.exist')
-    cy.get('[data-testid="application-dashboard-button"]').should('not.exist')
-  })
-
-  it('App Dashboard - vitals elements load when contextual analytics feature flag is on', () => {
-    cy.mockLaunchDarklyFlags([{ name: 'ma-1002-dev-portal-contextual-analytics', value: true }])
     cy.mockApplications(apps, 4)
 
     cy.intercept('GET', `**/api/v2/applications/${apps[0].id}`, {
@@ -110,5 +101,54 @@ describe('Contextual Developer Analytics', () => {
 
     cy.get('[data-testid="k-multiselect-input"]').should('exist').click()
     cy.get('.k-multiselect-item').first().should('contain', mockedServiceVersionName)
+  })
+
+  it('My Apps – metric cards if no analytics', () => {
+    mockConfig(false)
+
+    cy.mockApplications(apps, 4)
+
+    cy.visit('/', { useOriginalFn: true })
+    cy.visit('/my-apps')
+
+    cy.get(selectors.metricCardsParent).should('not.exist')
+
+    cy.get('[data-testid="applications-table"]').find('.actions-badge').first().click()
+    cy.get(selectors.dashboardDropdownLink).should('not.exist')
+  })
+
+  it('App Dashboard - no vitals elements if no analytics', () => {
+    mockConfig(false)
+
+    cy.mockApplications(apps, 4)
+
+    cy.intercept('GET', `**/api/v2/applications/${apps[0].id}`, {
+      statusCode: 200,
+      body: apps[0],
+      delay: 0
+    }).as('getSingleApplication')
+
+    cy.intercept(
+      'GET',
+      `**/api/v2/applications/${apps[0].id}/registrations*`,
+      {
+        body: {
+          data: productRegistrations,
+          meta: {
+            page: {
+              total: 1,
+              number: 1,
+              size: 1
+            }
+          }
+        },
+        delay: 0
+      }
+    ).as('getApplicationRegistration')
+
+    cy.visit(`/application/${apps[0].id}/application-dashboard`)
+
+    // There should be a forbidden page.
+    cy.get('section.forbidden').should('exist')
   })
 })

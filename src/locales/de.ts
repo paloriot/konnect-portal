@@ -1,4 +1,6 @@
 import { I18nType } from './i18n-type'
+import { translationNeeded } from '@/locales/index'
+import { en } from '@/locales/en'
 
 export const de: I18nType = {
   login: {
@@ -38,9 +40,21 @@ export const de: I18nType = {
   productVersion: {
     deprecatedWarningProduct: 'Diese Produktversion ist veraltet. Die Endpunkte bleiben voll funktionsfähig, bis diese Version eingestellt wird.',
     unableToRetrieveDoc: 'Keine Dokumentation verfügbar',
-    noProductVersionsDetail: 'This has not been translated',
-    noProductVersionsTitle: 'This has not been translated',
-    registerProductVersion: 'This has not been translated'
+    noProductVersionsDetail: translationNeeded(en.productVersion.noProductVersionsDetail),
+    noProductVersionsTitle: translationNeeded(en.productVersion.noProductVersionsTitle),
+    registerProductVersion: translationNeeded(en.productVersion.registerProductVersion)
+  },
+  authStrategyInfo: {
+    titleLabel: translationNeeded(en.authStrategyInfo.titleLabel),
+    credentialTypeLabel: translationNeeded(en.authStrategyInfo.credentialTypeLabel),
+    registerBtnText: (productVersionName: string) => translationNeeded(en.authStrategyInfo.registerBtnText(productVersionName)),
+    authMethods: translationNeeded(en.authStrategyInfo.authMethods),
+    keyNames: translationNeeded(en.authStrategyInfo.keyNames),
+    bearer: translationNeeded(en.authStrategyInfo.bearer),
+    keyAuth: translationNeeded(en.authStrategyInfo.keyAuth),
+    clientCredentials: translationNeeded(en.authStrategyInfo.clientCredentials),
+    selfManagedClientCredentials: translationNeeded(en.authStrategyInfo.selfManagedClientCredentials),
+    session: translationNeeded(en.authStrategyInfo.session)
   },
   userDropdown: {
     myApps: 'Meine Applikationen',
@@ -101,8 +115,13 @@ export const de: I18nType = {
     delete: 'Löschen',
     proceed: 'Weiter',
     applicationName: 'Name der Applikation',
-    clientID: 'Client ID: ',
-    clientSecret: 'Client Secret: ',
+    authStrategy: translationNeeded(en.application.authStrategy),
+    authStrategyWarning: translationNeeded(en.application.authStrategyWarning),
+    grantedScopes: translationNeeded(en.application.grantedScopes),
+    availableScopes: translationNeeded(en.application.availableScopes),
+    filterScopesPlaceholder: translationNeeded(en.application.filterScopesPlaceholder),
+    clientID: translationNeeded(en.application.clientID),
+    clientSecret: translationNeeded(en.application.clientSecret),
     reqField: ' Pflichtfeld',
     redirectUriLabel: 'Redirect URI',
     applicationCredentials: 'Zugangsdaten der Applikation',
@@ -125,33 +144,34 @@ export const de: I18nType = {
     headerDescription4: 'Bitte kopieren und an einem sicheren Ort speichern.'
   },
   analytics: {
-    filterLabelProductVersions: 'This has not been translated',
-    chartOverview: 'This has not been translated',
-    chartTitleRequests: 'This has not been translated',
-    chartTitleLatency: 'This has not been translated',
-    chartTitle4xxProductVersion: 'This has not been translated',
-    chartTitle5xxProductVersion: 'This has not been translated',
-    chartTitle4xxStatusCode: 'This has not been translated',
-    chartTitle5xxStatusCode: 'This has not been translated',
-    dashboard: 'This has not been translated',
-    resultsLimited: 'This has not been translated',
-    notAvailable: 'This has not been translated',
-    sectionCurrent: 'This has not been translated',
-    sectionLast: 'This has not been translated',
-    sectionPrevious: 'This has not been translated',
-    selectDateRange: 'This has not been translated',
-    selectProductVersions: 'This has not been translated',
-    summary: 'This has not been translated',
-    summary24Hours: 'This has not been translated',
-    summary30Days: 'This has not been translated',
-    summaryTooltip: (timespan: string) => `This ${timespan} has not been translated`,
-    timeRange: 'This has not been translated',
-    totalRequests: 'This has not been translated',
-    unableToFetch: (itemName: string) => `This has not been translaed ${itemName}`,
-    viewAnalytics: 'This has not been translateds'
+    filterLabelProductVersions: translationNeeded(en.analytics.filterLabelProductVersions),
+    chartOverview: translationNeeded(en.analytics.chartOverview),
+    chartTitleRequests: translationNeeded(en.analytics.chartTitleRequests),
+    chartTitleLatency: translationNeeded(en.analytics.chartTitleLatency),
+    chartTitle4xxProductVersion: translationNeeded(en.analytics.chartTitle4xxProductVersion),
+    chartTitle5xxProductVersion: translationNeeded(en.analytics.chartTitle5xxProductVersion),
+    chartTitle4xxStatusCode: translationNeeded(en.analytics.chartTitle4xxStatusCode),
+    chartTitle5xxStatusCode: translationNeeded(en.analytics.chartTitle5xxStatusCode),
+    dashboard: translationNeeded(en.analytics.dashboard),
+    resultsLimited: translationNeeded(en.analytics.resultsLimited),
+    notAvailable: translationNeeded(en.analytics.notAvailable),
+    sectionCurrent: translationNeeded(en.analytics.sectionCurrent),
+    sectionLast: translationNeeded(en.analytics.sectionLast),
+    sectionPrevious: translationNeeded(en.analytics.sectionPrevious),
+    selectDateRange: translationNeeded(en.analytics.selectDateRange),
+    selectProductVersions: translationNeeded(en.analytics.selectProductVersions),
+    summary: translationNeeded(en.analytics.summary),
+    summary24Hours: translationNeeded(en.analytics.summary24Hours),
+    summary30Days: translationNeeded(en.analytics.summary30Days),
+    summaryTooltip: (timespan: string) => translationNeeded(en.analytics.summaryTooltip(timespan)),
+    timeRange: translationNeeded(en.analytics.timeRange),
+    totalRequests: translationNeeded(en.analytics.totalRequests),
+    unableToFetch: (itemName: string) => translationNeeded(en.analytics.unableToFetch(itemName)),
+    viewAnalytics: translationNeeded(en.analytics.viewAnalytics)
   },
   productList: {
     titleProducts: 'Produkte',
+    showMoreLabel: (items: string) => translationNeeded(en.productList.showMoreLabel(items)),
     actions: {
       unregister: 'Registrierung aufheben'
     },
@@ -181,6 +201,12 @@ export const de: I18nType = {
   },
   applicationRegistration: {
     noAvailableApplications: 'Aktuell haben Sie noch keine Applikationen registriert.',
+    noFoundApplications: translationNeeded(en.applicationRegistration.noFoundApplications),
+    searchPlaceholder: translationNeeded(en.applicationRegistration.searchPlaceholder),
+    filterScopes: translationNeeded(en.applicationRegistration.filterScopes),
+    availableScopesLabel: translationNeeded(en.applicationRegistration.availableScopesLabel),
+    fetchingScopesLabel: translationNeeded(en.applicationRegistration.fetchingScopesLabel),
+    updateScopesWarning: translationNeeded(en.applicationRegistration.updateScopesWarning),
     noApplications: 'Keine Applikationen',
     selectApplication: 'Applikation auswählen',
     createNewApplication: 'Neue Applikation anlegen +',
@@ -204,8 +230,8 @@ export const de: I18nType = {
     isEmail: 'E-Mail ist ungültig'
   },
   apiDocumentation: {
-    emptyTitle: 'This has not been translated',
-    emptyMessage: 'This has not been translated',
+    emptyTitle: translationNeeded(en.apiDocumentation.emptyTitle),
+    emptyMessage: translationNeeded(en.apiDocumentation.emptyMessage),
     error: {
       description: 'Ein unerwarteter Fehler ist aufgetreten, als versucht wurde, das angeforderte Dokument zu laden. Bitte versuchen Sie es später noch einmal',
       linkText: 'Zurück zum Start →'
@@ -218,7 +244,7 @@ export const de: I18nType = {
     linkText: 'Zurück zum Start →'
   },
   sidebar: {
-    noVersions: 'This has not been translated',
+    noVersions: translationNeeded(en.sidebar.noVersions),
     deprecated: ' (Veraltet)',
     noResultsProduct: 'Keine Produktversionen'
   },
@@ -276,16 +302,24 @@ export const de: I18nType = {
     logoAlt: 'Logo'
   },
   myApp: {
+    authStrategyWarning: translationNeeded(en.application.authStrategyWarning),
+    authStrategyFetchError: (errString: string) => translationNeeded(en.myApp.authStrategyFetchError(errString)),
     newApp: 'Neue Applikation',
     plus: 'Plus',
     myApps: 'Meine Applikationen',
     refreshSecret: 'Secret erneuern',
+    refreshSecretSuccess: translationNeeded(en.myApp.refreshSecretSuccess),
+    refreshSecretFailure: (error: string) => translationNeeded(en.myApp.refreshSecretFailure(error)),
+    noSearchResults: translationNeeded(en.myApp.noSearchResults),
+    searchPlaceholder: translationNeeded(en.myApp.searchPlaceholder),
     delete: 'Löschen',
     cancel: 'Abbrechen',
     noApp: 'Keine Applikationen',
     create: 'Neue Applikation anlegen',
     getStarted: ' um loszulegen',
-    deleteDialog: (name: string) => `Sind Sie sicher, dass Sie ${name} löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.`
+    deleteDialog: (name: string) => `Sind Sie sicher, dass Sie ${name} löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.`,
+    deleteSuccess: translationNeeded(en.myApp.deleteSuccess),
+    deleteFailure: (str: string) => translationNeeded(en.myApp.deleteFailure(str))
   },
   router: {
     portalTitle: 'Entwicklerportal',
@@ -295,6 +329,7 @@ export const de: I18nType = {
     resetPasswordTitle: 'Passwort zurücksetzen',
     catalogTitleProduct: 'Produktkatalog',
     specTitle: 'API Spezifikation',
+    oauth2RedirectTitle: translationNeeded(en.router.oauth2RedirectTitle),
     docsTitle: 'API Dokumentation',
     appsTitle: 'Meine Applikationen',
     createAppTitle: 'Neue Applikation anlegen',
@@ -304,5 +339,12 @@ export const de: I18nType = {
     notFoundTitle: 'Nicht gefunden',
     forbiddenTitle: 'Zugriff verweigert',
     errorTitle: 'Fehler'
+  },
+  oauth2: {
+    dataNotFound: translationNeeded(en.oauth2.dataNotFound),
+    moreInfo: translationNeeded(en.oauth2.moreInfo),
+    noDescription: translationNeeded(en.oauth2.noDescription),
+    authMaybeUnsafe: translationNeeded(en.oauth2.authMaybeUnsafe),
+    defaultError: translationNeeded(en.oauth2.defaultError)
   }
 }
